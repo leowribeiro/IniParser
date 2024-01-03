@@ -1,3 +1,12 @@
+/* ------------------------------------------------------------
+
+IniParser v1.0 - a *.ini file reader for C++
+03/01/2024
+Leonardo W. Ribeiro
+
+*/ ------------------------------------------------------------
+
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -221,6 +230,7 @@ void IniParser::print(){
     }
 }
 
+/*
 int main(){
 	
 	IniParser config("config.ini");
@@ -230,4 +240,5 @@ int main(){
 	
 	return 0;
 }
+*/
 
