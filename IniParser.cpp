@@ -2,7 +2,7 @@
 /*
 ------------------------------------------------------------
 
-IniParser v1.3 - a *.ini file reader for C++
+IniParser v1.4 - a *.ini file reader for C++
 04/01/2024
 Leonardo W. Ribeiro
 
@@ -53,6 +53,10 @@ class IniParser {
 	
 		IniParser(std::string fileName = ""){
 			this->fileName = fileName;
+		}
+	
+		void setFilename(std::string filename){
+			this->fileName = filename;
 		}
 	
 		std::map<std::string, std::string>& operator[](std::string section){
@@ -154,7 +158,7 @@ void IniParser::parse(){
 	std::string curSection;
 	int state = 0;
 	
-	int i = 0;
+	unsigned int i = 0;
 	int lineNumber = 1;
 	
 	for(i=0; i<tokens.size(); i++){
