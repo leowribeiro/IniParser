@@ -2,7 +2,7 @@
 /*
 ------------------------------------------------------------
 
-IniParser v1.2 - a *.ini file reader for C++
+IniParser v1.3 - a *.ini file reader for C++
 04/01/2024
 Leonardo W. Ribeiro
 
@@ -151,7 +151,6 @@ bool IniParser::isIdent(std::string &str){
 
 void IniParser::parse(){
 		
-	
 	std::string curSection;
 	int state = 0;
 	
@@ -225,6 +224,8 @@ void IniParser::parse(){
 		
 		throw SyntaxError(message);
 	}
+
+	tokens.clear();
 
 }
 
