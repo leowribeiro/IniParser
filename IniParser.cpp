@@ -1,10 +1,13 @@
-/* ------------------------------------------------------------
 
-IniParser v1.0 - a *.ini file reader for C++
-03/01/2024
+/*
+------------------------------------------------------------
+
+IniParser v1.2 - a *.ini file reader for C++
+04/01/2024
 Leonardo W. Ribeiro
 
-*/ ------------------------------------------------------------
+------------------------------------------------------------
+*/
 
 
 #include <iostream>
@@ -63,6 +66,7 @@ class IniParser {
 		void read();
 		void print();
 };
+
 
 bool IniParser::reserved(unsigned char c){
 	
@@ -146,13 +150,7 @@ bool IniParser::isIdent(std::string &str){
 }
 
 void IniParser::parse(){
-	
-	/*
-	FINITE STATE MACHINE
-	START(0) -> [(1) -> IDENT(2) -> ](3) -> START(0)
-	START(0) -> IDENT(4) -> =(5) -> IDENT(6) -> START(0)
-	START(0) -> ;(7) -> IDENT(8) -> START(0)
-	*/
+		
 	
 	std::string curSection;
 	int state = 0;
@@ -163,63 +161,71 @@ void IniParser::parse(){
 	for(i=0; i<tokens.size(); i++){
 			
 		std::string token = tokens[i];
-		
-		if( token == "\n" ){
+	
+		if( (state == 0) && (token == "[") ) {state = 1;}
+		else if( (state == 1) && isIdent(token) ) {state = 2;}
+		else if( (state == 2) && (token == "]") ){
+			state = 0;
+			curSection = tokens[i-1];
+		}
+		else if( (state == 0) && isIdent(token) ) {state = 3;}
+		else if( (state == 3) && (token == "=") ) {state = 4;}
+		else if( (state == 4) && isIdent(token) ){
+			state = 0;
+			internal[curSection][tokens[i-2]] = token;
+		}
+		else if( (state == 4) && (token == "\n") ){
+			state = 0;
+			internal[curSection][tokens[i-2]] = "";
 			lineNumber++;
 		}
-		else{
+		else if( (state == 0) && (token == ";") ) {state = 5;}
+		else if( (state == 5) && isIdent(token) ) {state = 0;}
+		else if( (state == 0) && (token == "\n") ) {
+			state = 0;
+			lineNumber++;
+		}
+		else {
+			std::string message = "Syntax error on file \"" + fileName + "\" at line ";
 			
-			if( (state == 0) && (token == "[") ) {state = 1;}
-			else if( (state == 1) && isIdent(token) )	{state = 2;}
-			else if( (state == 2) && (token == "]") ){
-				state = 0;
-				curSection = tokens[i-1];
-			}
-			else if( (state == 0) && isIdent(token) ) {state = 4;}
-			else if( (state == 4) && (token == "=") ) {state = 5;}
-			else if( (state == 5) && isIdent(token) ){
-				state = 0;
-				internal[curSection][tokens[i-2]] = token;
-			}
-			else if( (state == 0) && (token == ";") ) {state = 7;}
-			else if( (state == 7) && isIdent(token) ) {state = 0;}
-			else {
-				std::string message = "Syntax error at line ";
+			message += std::to_string(lineNumber);
+			message += ".\n...";
 				
-				message += std::to_string(lineNumber);
-				message += ".\n...";
-					
-				if( (i-1) >= 0 )
-					message += tokens[i-1];
-				message += " ->";
+			if( (i-1) >= 0 )
+				message += tokens[i-1];
+			message += " ->";
+			if(token != "\n")
 				message += token;
-				message += "<- ";
-				if( (i+1) < tokens.size())
-					message += tokens[i+1];
-				
-				message += "...";
-				
-				throw SyntaxError(message);
-			}
+			else
+				message += "LF";
+			message += "<- ";
+			if( (i+1) < tokens.size())
+				message += tokens[i+1];
+			
+			message += "...";
+			
+			throw SyntaxError(message);
 		}
 	}
 
 	if( state != 0 ){
 		
-		std::string message = "Syntax error at line ";
+		std::string message = "Syntax error on file \"" + fileName + "\" at line ";
 		message += std::to_string(lineNumber);
 		message += ".\n...";
 		
 		if( (i-1) >= 0 )
 			message += tokens[i-1];
 		message += " ->";
-		message += tokens[i];
+		if(tokens[i] != "\n")
+			message += tokens[i];
+		else
+			message += "LF";
 		message += "<- EOF";
 		
 		throw SyntaxError(message);
 	}
-	
-	print();
+
 }
 
 void IniParser::print(){
@@ -235,10 +241,10 @@ int main(){
 	
 	IniParser config("config.ini");
 	config.read();
-
-	
+	config.print();
 	
 	return 0;
 }
 */
+
 
